@@ -103,7 +103,7 @@ typedef struct
 #define GPIO_LOCK_ERROR	 				0	  /* GPIO Pin Lock Error 	*/
 
 /* ================================================================ */
-/* ============== APIs Supported by "MCAL ..... DRIVER" =========== */
+/* ============== APIs Supported by "MCAL GPIO DRIVER" ============ */
 /* ================================================================ */
 
 void MCAL_GPIO_Init(GPIO_Typedef_t *GPIOx,GPIO_PinConfig_t *PinConfig);

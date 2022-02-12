@@ -5,6 +5,8 @@
  *      Author: Mina Karam
  */
 
+#include "gpio.h"
+
 int main(void)
 {
 	for(;;);
