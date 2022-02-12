@@ -32,7 +32,7 @@
 #define SRAM2_BASE			0x2001C000U		/* Base address of SRAM2 memory 	*/
 
 /* ================================================================ */
-/* ====== AHBx and APBx Bus Peripheral Base Addresses============== */
+/* ====== AHBx and APBx Bus Peripheral Base Addresses ============= */
 /* ================================================================ */
 
 #define PERIPH_BASE			0x40000000U		/* Base address of PERIPHERALS memory 	  */
@@ -95,13 +95,60 @@
 /* ================= Peripheral Registers GPIO ==================== */
 /* ================================================================ */
 
-
+typedef struct
+{
+	vuint32_t MODER;  		/* GPIO port mode register, 	    			Address offset: 0x00 */
+	vuint32_t OTYPER; 		/* GPIO port output type register,  			Address offset: 0x04 */
+	vuint32_t OSPEEDR;  	/* GPIO port output speed register, 			Address offset: 0x08 */
+	vuint32_t PUPDR; 		/* GPIO port pull-up/down register, 			Address offset: 0x0C */
+	vuint32_t IDR; 			/* GPIO port input data register,    			Address offset: 0x10 */
+	vuint32_t ODR; 			/* GPIO port output data register, 	 			Address offset: 0x14 */
+	vuint32_t BSRR; 		/* GPIO port bit set/reset register, 			Address offset: 0x18 */
+	vuint32_t LCKR; 		/* GPIO port configuration lock register,		Address offset: 0x1C */
+	vuint32_t AFRL;			/* AFRL: GPIO alternate function low register,	Address offset: 0x20 */
+	vuint32_t AFRL;			/* AFRH: GPIO alternate function low register,	Address offset: 0x24 */
+}GPIO_Typedef_t;
 
 /* ================================================================ */
 /* ================= Peripheral Registers RCC  ==================== */
 /* ================================================================ */
 
-
+typedef struct
+{
+	vuint32_t CR;				/* RCC clock control register, 	    				Address offset: 0x00 	*/
+	vuint32_t PLLCFGR;			/* RCC PLL configuration register, 	    			Address offset: 0x04 	*/
+	vuint32_t CFGR;				/* RCC clock configuration register, 	   			Address offset: 0x08 	*/
+	vuint32_t CIR;				/* RCC clock interrupt register, 	    			Address offset: 0x0C 	*/
+	vuint32_t AHB1RSTR;			/* RCC AHB1 peripheral reset register, 	    			Address offset: 0x10 	*/
+	vuint32_t AHB2RSTR;			/* RCC AHB2 peripheral reset register, 	    			Address offset: 0x14 	*/
+	vuint32_t AHB3RSTR;			/* RCC AHB3 peripheral reset register, 	    			Address offset: 0x18 	*/
+	uint32_t  Reserved_RCC_0;	/* RCC reserved register, 					Address offset: 0x1C 	*/
+	vuint32_t APB1RSTR;			/* RCC APB1 peripheral reset register, 	    			Address offset: 0x20 	*/
+	vuint32_t APB2RSTR;			/* RCC APB2 peripheral reset register, 	    			Address offset: 0x24 	*/
+	uint32_t  Reserved_RCC_1[2];/* RCC reserved register, 					Address offset: 0x28-2C */
+	vuint32_t AHB1ENR;			/* RCC AHB1 peripheral clock enable register, 	    		Address offset: 0x30 	*/
+	vuint32_t AHB2ENR;			/* RCC AHB2 peripheral clock enable register, 	    		Address offset: 0x34 	*/
+	vuint32_t AHB3ENR;			/* RCC AHB3 peripheral clock enable register, 	    		Address offset: 0x38 	*/
+	uint32_t  Reserved_RCC_2;	/* RCC reserved register, 					Address offset: 0x3C 	*/
+	vuint32_t APB1ENR;			/* RCC APB1 peripheral clock enable register, 	    		Address offset: 0x40 	*/
+	vuint32_t APB2ENR;			/* RCC APB2 peripheral clock enable register, 	    		Address offset: 0x44 	*/
+	uint32_t  Reserved_RCC_3[2];/* RCC reserved register, 					Address offset: 0x48-4C */
+	vuint32_t AHB1LPENR;		/* RCC AHB1 peripheral clock enable in low power mode register,	Address offset: 0x50 	*/
+	vuint32_t AHB2LPENR;		/* RCC AHB2 peripheral clock enable in low power mode register,	Address offset: 0x54 	*/
+	vuint32_t AHB3LPENR;		/* RCC AHB3 peripheral clock enable in low power mode register,	Address offset: 0x58 	*/
+	uint32_t  Reserved_RCC_4;	/* RCC reserved register, 					Address offset: 0x5C 	*/
+	vuint32_t APB1LPENR;		/* RCC APB1 peripheral clock enable in low power mode register,	Address offset: 0x60 	*/
+	vuint32_t APB2LPENR;		/* RCC APB2 peripheral clock enable in low power mode register,	Address offset: 0x64 	*/
+	uint32_t  Reserved_RCC_5[2];/* RCC reserved register, 					Address offset: 0x68-6C */
+	vuint32_t BDCR;				/* RCC back up domain control register, 			Address offset: 0x70 	*/
+	vuint32_t CSR;				/* RCC clock control & status register, 			Address offset: 0x74 	*/
+	uint32_t  Reserved_RCC_6[2];/* RCC reserved register, 					Address offset: 0x78-7C */
+	vuint32_t SSCGR;			/* RCC spread spectrum clock generation register, 		Address offset: 0x80 	*/
+	vuint32_t PLLI2SCFGR;		/* RCC PLLI2S configuration register, 				Address offset: 0x84 	*/
+	vuint32_t PLLSAICFGR;		/* RCC PLL configuration register, 				Address offset: 0x88 	*/
+	vuint32_t DCKCFGR;			/* RCC dedicated clock configuration register, 			Address offset: 0x8C 	*/
+	vuint32_t CKGATENR;			/* RCC clock gated enable register, 				Address offset: 0x90 	*/
+}RCC_Typedef_t;
 
 /* ================================================================ */
 /* ================= Peripheral Registers EXTI ==================== */
@@ -119,7 +166,16 @@
 /* =================== Peripheral Instants  ======================= */
 /* ================================================================ */
 
+#define GPIOA 			((GPIO_Typedef_t *) GPIOA_BASE)
+#define GPIOB 			((GPIO_Typedef_t *) GPIOB_BASE)
+#define GPIOC 			((GPIO_Typedef_t *) GPIOC_BASE)
+#define GPIOD			((GPIO_Typedef_t *) GPIOD_BASE)
+#define GPIOE 			((GPIO_Typedef_t *) GPIOE_BASE)
+#define GPIOF 			((GPIO_Typedef_t *) GPIOF_BASE)
+#define GPIOG 			((GPIO_Typedef_t *) GPIOG_BASE)
+#define GPIOH 			((GPIO_Typedef_t *) GPIOH_BASE)
 
+#define RCC				((RCC_Typedef_t*) RCC_BASE)
 
 /* ================================================================ */
 /* ===================== Clock Enable Macros ====================== */
