@@ -21,6 +21,15 @@
 #define __IO 		volatile
 #define __weak 		__attribute__((weak))
 
+#define SET 				1
+#define RESET 				0
+#define ENABLE 				SET
+#define DISABLE 			RESET
+#define GPIO_PIN_SET		SET
+#define GPIO_PIN_RESET		RESET
+#define FLAG_SET			SET
+#define FLAG_RESET			RESET
+
 /* ================================================================ */
 /* ========== Base Addresses of FLASH and SRAM memories =========== */
 /* ================================================================ */
@@ -178,10 +187,40 @@ typedef struct
 #define RCC				((RCC_Typedef_t*) RCC_BASE)
 
 /* ================================================================ */
-/* ===================== Clock Enable Macros ====================== */
+/* =========== Clock Enable/Disable/Reset Macros ================== */
 /* ================================================================ */
 
+/* ============ GPIOx peripherals ============ */
 
+/*-*-*-*-* Enable *-*-*-*-*/
+#define GPIOA_PCLK_EN()		( RCC->AHB1ENR |= (1 << 0) ) /* GPIOA peripheral clock enabled */
+#define GPIOB_PCLK_EN()		( RCC->AHB1ENR |= (1 << 1) ) /* GPIOB peripheral clock enabled */
+#define GPIOC_PCLK_EN()		( RCC->AHB1ENR |= (1 << 2) ) /* GPIOC peripheral clock enabled */
+#define GPIOD_PCLK_EN()		( RCC->AHB1ENR |= (1 << 3) ) /* GPIOD peripheral clock enabled */
+#define GPIOE_PCLK_EN()		( RCC->AHB1ENR |= (1 << 4) ) /* GPIOE peripheral clock enabled */
+#define GPIOF_PCLK_EN()		( RCC->AHB1ENR |= (1 << 5) ) /* GPIOF peripheral clock enabled */
+#define GPIOG_PCLK_EN()		( RCC->AHB1ENR |= (1 << 6) ) /* GPIOG peripheral clock enabled */
+#define GPIOH_PCLK_EN()		( RCC->AHB1ENR |= (1 << 7) ) /* GPIOH peripheral clock enabled */
+
+/*-*-*-*-* Disable *-*-*-*-*/
+#define GPIOA_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 0) ) /* GPIOA peripheral clock disabled */
+#define GPIOB_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 1) ) /* GPIOB peripheral clock disabled */
+#define GPIOC_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 2) ) /* GPIOC peripheral clock disabled */
+#define GPIOD_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 3) ) /* GPIOD peripheral clock disabled */
+#define GPIOE_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 4) ) /* GPIOE peripheral clock disabled */
+#define GPIOF_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 5) ) /* GPIOF peripheral clock disabled */
+#define GPIOG_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 6) ) /* GPIOG peripheral clock disabled */
+#define GPIOH_PCLK_DI()		( RCC->AHB1ENR &= ~(1 << 7) ) /* GPIOH peripheral clock disabled */
+
+/*-*-*-*-* Reset *-*-*-*-*/
+#define GPIOA_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 0)); (RCC->AHB1RSTR &= ~(1 << 0)); }while(0)
+#define GPIOB_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 1)); (RCC->AHB1RSTR &= ~(1 << 1)); }while(0)
+#define GPIOC_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 2)); (RCC->AHB1RSTR &= ~(1 << 2)); }while(0)
+#define GPIOD_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 3)); (RCC->AHB1RSTR &= ~(1 << 3)); }while(0)
+#define GPIOE_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 4)); (RCC->AHB1RSTR &= ~(1 << 4)); }while(0)
+#define GPIOF_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 5)); (RCC->AHB1RSTR &= ~(1 << 5)); }while(0)
+#define GPIOG_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 6)); (RCC->AHB1RSTR &= ~(1 << 6)); }while(0)
+#define GPIOH_REG_RESET()	do{ (RCC->AHB1RSTR |= (1 << 7)); (RCC->AHB1RSTR &= ~(1 << 7)); }while(0)
 
 
 
