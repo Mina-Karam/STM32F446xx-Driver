@@ -115,7 +115,7 @@ typedef struct
 	vuint32_t BSRR; 		/* GPIO port bit set/reset register, 			Address offset: 0x18 */
 	vuint32_t LCKR; 		/* GPIO port configuration lock register,		Address offset: 0x1C */
 	vuint32_t AFRL;			/* AFRL: GPIO alternate function low register,	Address offset: 0x20 */
-	vuint32_t AFRL;			/* AFRH: GPIO alternate function low register,	Address offset: 0x24 */
+	vuint32_t AFRH;			/* AFRH: GPIO alternate function low register,	Address offset: 0x24 */
 }GPIO_Typedef_t;
 
 /* ================================================================ */

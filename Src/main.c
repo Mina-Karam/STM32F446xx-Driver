@@ -5,6 +5,8 @@
  *      Author: Mina Karam
  */
 
+#include <stm32f446xx_gpio.h>
+
 int main(void)
 {
 	for(;;);
