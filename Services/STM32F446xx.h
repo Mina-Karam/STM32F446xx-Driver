@@ -47,7 +47,6 @@
 
 #define NVIC_SYSTCK_BASE		0xE000E010U	/* SysTick Control and Status Register */
 
-#define NVIC_NONIMPL_LOW_BITS	4
 #define NO_PR_BITS_IMPLEMENTED  4 /* ARM Cortex Mx Processor number of priority bits implemented in Priority Register */
 
 /* ==================================================================================== */
@@ -227,7 +226,7 @@ typedef struct
 	vuint32_t CMPCR; 		/* SYSCFG Compensation cell control register, 	 	Address offset: 0x20 	*/
 	uint32_t  RESERVED_1[2];/* SYSCFG Reserved register, 						Address offset: 0x24-28 */
 	vuint32_t CFGR; 		/* SYSCFG Configuration register, 	 				Address offset: 0x2C 	*/
-}STSCFG_Typedef_t;
+}SYSCFG_Typedef_t;
 
 /* ==================================================================================== */
 /* ============================ Cortex-M4 Specific Registers ========================== */
@@ -366,7 +365,7 @@ typedef struct
 #define SYSCFG_PCLK_DI()	( RCC->APB2ENR &= ~(1 << 14) )  /* SYSCFG peripheral clock disabled */
 
 /*-*-*-*-* Reset *-*-*-*-*/
-#define SYSCFG_REG_RESET()	do{ (RCC->AHB2RSTR |= (1 << 14)); (RCC->AHB1RSTR &= ~(1 << 14)); }while(0)
+#define SYSCFG_REG_RESET()	do{ (RCC->AHB2RSTR |= (1 << 14)); (RCC->AHB2RSTR &= ~(1 << 14)); }while(0)
 
 
 /* =============================================================================== */
