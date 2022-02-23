@@ -1,5 +1,5 @@
 /*
- * gpio.c
+ * stm32f446xx_gpio_driver.c
  *
  *  Created on: Feb 12, 2022
  *      Author: Mina Karam
@@ -7,12 +7,6 @@
 
 
 #include <stm32f446xx_gpio.h>
-
-/* ================================================ */
-/* ================ Private APIs ================== */
-/* ================================================ */
-
-static void GPIO_PeriClockControl(GPIO_Typedef_t *GPIOx, uint8_t State);
 
 /* ================================================ */
 /* ================ Public APIs =================== */
@@ -37,7 +31,7 @@ void MCAL_GPIO_Init(GPIO_Typedef_t *GPIOx,GPIO_PinConfig_t *PinConfig)
 	uint32_t REGISTER_CONFIG = (uint32_t)NULL;
 
 	/* 1. Set GPIO pin mode configuration */
-	if(PinConfig->PinMode == GPIO_MODE_ANALOG)
+	if(PinConfig->PinMode <= GPIO_MODE_ANALOG)
 	{
 		/* Put the Pin mode to its specific pin for the register with is 32 bit */
 		REGISTER_CONFIG = (PinConfig->PinMode << (2 * PinConfig->PinNumber));
@@ -50,6 +44,49 @@ void MCAL_GPIO_Init(GPIO_Typedef_t *GPIOx,GPIO_PinConfig_t *PinConfig)
 
 		/*Set Register configuration to zero for next use of it */
 		REGISTER_CONFIG = 0;
+	}
+	else
+	{
+		/* For Setting the interrupt mode*/
+
+		/* Enable clock to SYSCFG (needed to set IRQ in EXTI)*/
+		SYSCFG_PCLK_EN();
+
+
+		/* 1. Set rising/falling edge trigger(s) */
+
+		/* Reset it first */
+		EXTI->RTSR &= ~(1 << PinConfig->PinNumber);
+		EXTI->FTSR &= ~(1 << PinConfig->PinNumber);
+
+		if(PinConfig->PinMode == GPIO_MODE_INTERRUPT_RT)
+		{
+			EXTI->RTSR |= (1 << PinConfig->PinNumber);
+			EXTI->FTSR &= ~(1 << PinConfig->PinNumber);
+		}
+		else if(PinConfig->PinMode == GPIO_MODE_INTERRUPT_FT)
+		{
+			EXTI->FTSR |= (1 << PinConfig->PinNumber);
+			EXTI->RTSR &= ~(1 << PinConfig->PinNumber);
+		}
+		else if(PinConfig->PinMode == GPIO_MODE_INTERRUPT_FRT)
+		{
+			EXTI->RTSR |= (1 << PinConfig->PinNumber);
+			EXTI->FTSR |= (1 << PinConfig->PinNumber);
+		}
+
+		/* 2. Configure GPIO port selection in SYSCFG */
+		uint8_t SYSCFG_EXTICR_index = PinConfig->PinNumber / 4;
+		uint8_t SYSCFG_EXTICR_position = (PinConfig->PinNumber % 4) *4;
+
+		/* Clear the four bits first */
+		SYSCFG->EXTICR[SYSCFG_EXTICR_index] &= ~(0xF << SYSCFG_EXTICR_position);
+
+		/* Set the four bits for the port */
+		SYSCFG->EXTICR[SYSCFG_EXTICR_index] |= ((GPIO_BASE_TO_CODE(GPIOx) & 0xF) << SYSCFG_EXTICR_position);
+
+		/* 3. Enable EXTI interrupt using interrupt register masking */
+		EXTI->IMR |= (1 << PinConfig->PinNumber);
 	}
 
 	/* 2. Set GPIO pin Speed configuration */
@@ -64,13 +101,21 @@ void MCAL_GPIO_Init(GPIO_Typedef_t *GPIOx,GPIO_PinConfig_t *PinConfig)
 	GPIOx->PUPDR |= REGISTER_CONFIG;
 	REGISTER_CONFIG = 0;
 
-	/* 3. Configure pin output type (push-pull or open drain) */
+	/* 4. Configure pin output type (push-pull or open drain) */
 	REGISTER_CONFIG = (PinConfig->PinOPType << PinConfig->PinNumber);
 	GPIOx->OTYPER &= ~(0x1 << PinConfig->PinNumber);
 	GPIOx->OTYPER |= REGISTER_CONFIG;
 	REGISTER_CONFIG = 0;
 
-	/* 4. Configure alternate mode function */
+	/* 5. Configure alternate mode function */
+	if(PinConfig->PinMode == GPIO_MODE_ALTFN)
+	{
+		uint8_t AFR_EXTICR_index = PinConfig->PinNumber / 8;
+		uint8_t AFR_EXTICR_position = (PinConfig->PinNumber % 8) *4;
+
+		GPIOx->AFR[AFR_EXTICR_index] &= ~((0xF) << AFR_EXTICR_position);
+		GPIOx->AFR[AFR_EXTICR_index] |= (PinConfig->PinAltFunMode << AFR_EXTICR_position);
+	}
 
 
 }
@@ -186,14 +231,14 @@ uint8_t MCAL_GPIO_LockPin(GPIO_Typedef_t *GPIOx, uint16_t PinNumber)
 }
 
 /**================================================================
- * @Fn				- GPIO_PeriClockControl
+ * @Fn				- MCAL_GPIO_PeriClockControl
  * @brief			- This function enables or disables peripheral clock for the given GPIO port
  * @param [in] 		- GPIOx: where x can be (A..E depending on device used) to select GPIO peripheral
  * @param [in] 		- State: specific state (ENABLE, DISABLE Macros)
  * @retval 			- None
  * Note				- None
  */
-static void GPIO_PeriClockControl(GPIO_Typedef_t *GPIOx, uint8_t State)
+void MCAL_GPIO_PeriClockControl(GPIO_Typedef_t *GPIOx, uint8_t State)
 {
 	if (State == ENABLE)
 	{
@@ -218,28 +263,53 @@ static void GPIO_PeriClockControl(GPIO_Typedef_t *GPIOx, uint8_t State)
 		else if(GPIOx == GPIOH){ GPIOH_PCLK_DI(); }
 	}
 }
-//
-//static uint32_t GPIO_GetPositionInWord(uint16_t PinNumber)
-//{
-//	switch(PinNumber)
-//	{
-//		case GPIO_PIN_0: return 0; break;
-//		case GPIO_PIN_1: return 2; break;
-//		case GPIO_PIN_2: return 4; break;
-//		case GPIO_PIN_3: return 6; break;
-//		case GPIO_PIN_4: return 8; break;
-//		case GPIO_PIN_5: return 10; break;
-//		case GPIO_PIN_6: return 12; break;
-//		case GPIO_PIN_7: return 14; break;
-//		case GPIO_PIN_8: return 16; break;
-//		case GPIO_PIN_9: return 18; break;
-//		case GPIO_PIN_10: return 20; break;
-//		case GPIO_PIN_11: return 22; break;
-//		case GPIO_PIN_12: return 24; break;
-//		case GPIO_PIN_13: return 26; break;
-//		case GPIO_PIN_14: return 28; break;
-//		case GPIO_PIN_15: return 30; break;
-//		default: break;
-//	}
-//	return 0;
-//}
+
+/* ================================================================
+ * @Fn				- MCAL_GPIO_IRQConfig
+ * @brief			- Set or clear interrupt in processor NVIC
+ * @param [in] 		- IRQNumber: IRQ position being configured
+ * @param [in] 		- State: specific state (ENABLE, DISABLE Macros)
+ * @retval 			- None
+ * Note				- None
+ */
+void MCAL_GPIO_IRQConfig(uint8_t IRQNumber, uint8_t State)
+{
+	if(State == ENABLE)
+	{
+		NVIC_ISER->ISER[IRQNumber / 32] |= (1 << (IRQNumber % 32));
+	}
+	else if (State == DISABLE)
+	{
+		NVIC_ICER->ICER[IRQNumber / 32] |= (1 << (IRQNumber % 32));
+	}
+}
+
+/* ================================================================
+ * @Fn				- MCAL_GPIO_IRQPriorityConfig
+ * @brief			- Set interrupt priority in processor NVIC
+ * @param [in] 		- IRQNumber: IRQ position being configured
+ * @param [in] 		- IRQPriority: Priority value (0 - 255)
+ * @retval 			- None
+ * Note				- None
+ */
+void MCAL_GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority)
+{
+	uint8_t shift = 8 * (IRQNumber % 4) + NO_PR_BITS_IMPLEMENTED;
+	NVIC_IPR->IPR[IRQNumber / 4] |= (IRQPriority << shift);
+}
+
+/* ================================================================
+ * @Fn				- MCAL_GPIO_IRQHandling
+ * @brief			- Clear the pending register for set interrupt
+ * @param [in] 		- PinNumber: GPIO pin number which interrupt is on
+ * @retval 			- None
+ * Note				- None
+ */
+void MCAL_GPIO_IRQHandling(uint8_t PinNumber)
+{
+	if (EXTI->PR & (1 << PinNumber))
+	{
+		EXTI->PR |= (1 << PinNumber);
+	}
+}
+
